@@ -1,0 +1,10 @@
+{
+  "name": "school",
+  "compatibility_date": "2026-09-26",
+  "routes": [
+    { "pattern": "school.wesselsmit.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./"
+  }
+}
