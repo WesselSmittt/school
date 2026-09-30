@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Theorietoets · Wessel Smit</title>
-  <meta name="description" content="Theorietoets oefenmodule voor IoT, ANW, SDN en AUT.">
+  <title>Theory exam · Wessel Smit</title>
+  <meta name="description" content="Theory exam practice module for IoT, ANW, SDN and AUT.">
   <meta name="theme-color" content="#0b0c0e">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230b0c0e'/><path d='M18 28h14l8 38 10-38h0l10 38 8-38h14L68 76H56L50 52 44 76H32Z' fill='%23ff5a1f'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -551,6 +551,24 @@
     .brand-text { overflow: hidden; text-overflow: ellipsis; }
     .brand .crumb { color: var(--muted); font-weight: 400; }
 
+    .nav-right { display: flex; align-items: center; gap: 0.25rem; flex: none; }
+
+    .lang-toggle {
+      display: flex;
+      gap: 0.6ch;
+      font: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: #4a5059;
+      background: none;
+      border: 0;
+      padding: 0.35rem 0.6rem;
+      cursor: pointer;
+    }
+
+    .lang-toggle span.on { color: var(--accent); }
+    .lang-toggle:hover { background: var(--panel); color: var(--muted); }
+
     .back {
       font-size: 0.72rem;
       letter-spacing: 0.1em;
@@ -671,14 +689,17 @@
 <body>
 
   <header class="nav">
-    <nav class="nav-inner" aria-label="Navigatie">
+    <nav class="nav-inner" aria-label="Navigation" data-nl-aria-label="Navigatie">
       <a href="https://wesselsmit.com/" class="brand"><span class="brand-mark" aria-hidden="true">W</span><span class="brand-text">WESSEL SMIT <span class="crumb">/ SCHOOL / SPRINT 1-2</span></span></a>
-      <a href="../index.html" class="back">← school</a>
+      <div class="nav-right">
+        <button class="lang-toggle" type="button" data-lang-toggle><span data-lang="en">EN</span><span data-lang="nl">NL</span></button>
+        <a href="../index.html" class="back">← school</a>
+      </div>
     </nav>
   </header>
 
   <main>
-    <div class="tabs" role="tablist" aria-label="Vakken" id="tabs"></div>
+    <div class="tabs" role="tablist" aria-label="Subjects" data-nl-aria-label="Vakken" id="tabs"></div>
 
     <div class="terminal">
       <div class="terminal-bar"><span></span><span></span><span></span><em id="bar-title">~/school/sprint-1-2/quiz.sh</em></div>
@@ -688,6 +709,7 @@
 
   <footer>Built by Wessel Smit · 2026</footer>
 
+  <script src="/i18n.js"></script>
   <script>
 const DATA = {
 iot: [
@@ -913,8 +935,8 @@ aut: [
       { id: "anw", label: "ANW" },
       { id: "sdn", label: "SDN" },
       { id: "aut", label: "AUT" },
-      { id: "all", label: "Alles" },
-      { id: "rep", label: "🔁 Herhalen" },
+      { id: "all", label: L("All", "Alles") },
+      { id: "rep", label: L("🔁 Review", "🔁 Herhalen") },
     ];
 
     const COUNTS = [5, 10, 20, 30, "all"];
@@ -999,7 +1021,7 @@ aut: [
       const btn = e.target.closest(".tab");
       if (!btn) return;
       if (session && session.results.length > 0 &&
-          !confirm("Je sessie is nog bezig. Stoppen en van vak wisselen?")) return;
+          !confirm(L("Your session is still running. Stop and switch subject?", "Je sessie is nog bezig. Stoppen en van vak wisselen?"))) return;
       activeTab = btn.dataset.tab;
       session = null;
       tabsEl.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === activeTab));
@@ -1010,17 +1032,18 @@ aut: [
     // ---------- Setup ----------
     function showSetup() {
       const pool = keysFor(activeTab);
-      barTitle.textContent = `~/school/sprint-1-2/quiz.sh --vak ${activeTab}`;
+      barTitle.textContent = `~/school/sprint-1-2/quiz.sh ${L("--subject", "--vak")} ${activeTab}`;
 
       if (activeTab === "rep") return showRepeat(pool);
 
-      const title = activeTab === "all" ? "Alle vakken door elkaar" : `${tabLabel(activeTab)} theorietoets`;
+      const title = activeTab === "all" ? L("All subjects mixed", "Alle vakken door elkaar") : L(`${tabLabel(activeTab)} theory exam`, `${tabLabel(activeTab)} theorietoets`);
 
       view.innerHTML = `
         <div class="fade">
-          <p class="line"><span class="prompt">$</span> ./quiz.sh --vak ${activeTab} --pool ${pool.length}</p>
+          <p class="line"><span class="prompt">$</span> ./quiz.sh ${L("--subject", "--vak")} ${activeTab} --pool ${pool.length}</p>
           <h1>${esc(title)}</h1>
-          <p class="sub">Hoeveel vragen wil je oefenen? Ze worden willekeurig gekozen uit ${pool.length} vragen.</p>
+          <p class="sub">${L(`How many questions do you want to practise? They are picked at random from ${pool.length} questions.`, `Hoeveel vragen wil je oefenen? Ze worden willekeurig gekozen uit ${pool.length} vragen.`)}</p>
+          ${LANG() === "en" ? `<p class="hint" style="margin-top:0.4rem">The questions themselves are in Dutch, the language of the course.</p>` : ""}
           ${countButtons(pool.length)}
         </div>`;
       bindCounts(pool);
@@ -1029,9 +1052,9 @@ aut: [
     function countButtons(poolSize) {
       return `<div class="choices">${COUNTS.map(c => {
         const n = c === "all" ? poolSize : c;
-        const label = c === "all" ? "Alles" : c;
+        const label = c === "all" ? L("All", "Alles") : c;
         const disabled = poolSize === 0 || (c !== "all" && c > poolSize);
-        return `<button class="choice" data-n="${n}" ${disabled ? "disabled" : ""}>${label}<small>${n} vragen</small></button>`;
+        return `<button class="choice" data-n="${n}" ${disabled ? "disabled" : ""}>${label}<small>${n} ${L("questions", "vragen")}</small></button>`;
       }).join("")}</div>`;
     }
 
@@ -1046,9 +1069,9 @@ aut: [
       if (!pool.length) {
         view.innerHTML = `
           <div class="fade">
-            <p class="line"><span class="prompt">$</span> cat herhalen.txt</p>
-            <h1>🔁 Herhalen</h1>
-            <div class="empty"><span class="big">✓</span>Nog niks gemarkeerd.<br>Klik tijdens een sessie op <b>Weet ik niet</b> of <b>☆ herhalen</b> om vragen hier te verzamelen.</div>
+            <p class="line"><span class="prompt">$</span> cat ${L("review", "herhalen")}.txt</p>
+            <h1>${L("🔁 Review", "🔁 Herhalen")}</h1>
+            <div class="empty"><span class="big">✓</span>${L("Nothing marked yet.<br>During a session, click <b>I don't know</b> or <b>☆ review</b> to collect questions here.", "Nog niks gemarkeerd.<br>Klik tijdens een sessie op <b>Weet ik niet</b> of <b>☆ herhalen</b> om vragen hier te verzamelen.")}</div>
           </div>`;
         return;
       }
@@ -1061,7 +1084,7 @@ aut: [
             <summary>
               <span class="badge">${SUBJECTS[subj]}</span>
               <span class="q">${esc(q.q)}</span>
-              <button class="x" data-remove="${key}" title="Verwijder uit herhalen" aria-label="Verwijder uit herhalen">✕</button>
+              <button class="x" data-remove="${key}" title="${L("Remove from review", "Verwijder uit herhalen")}" aria-label="${L("Remove from review", "Verwijder uit herhalen")}">✕</button>
             </summary>
             <div class="body">
               <p class="ans">✓ ${LETTERS[q.ans]}. ${esc(q.opts[q.ans])}</p>
@@ -1072,12 +1095,12 @@ aut: [
 
       view.innerHTML = `
         <div class="fade">
-          <p class="line"><span class="prompt">$</span> cat herhalen.txt | wc -l → ${pool.length}</p>
-          <h1>🔁 Herhalen</h1>
-          <p class="sub">${pool.length} gemarkeerde ${pool.length === 1 ? "vraag" : "vragen"}. Oefen ze opnieuw, of klap er een open om het antwoord te bekijken.</p>
+          <p class="line"><span class="prompt">$</span> cat ${L("review", "herhalen")}.txt | wc -l → ${pool.length}</p>
+          <h1>${L("🔁 Review", "🔁 Herhalen")}</h1>
+          <p class="sub">${L(`${pool.length} marked ${pool.length === 1 ? "question" : "questions"}. Practise them again, or expand one to see the answer.`, `${pool.length} gemarkeerde ${pool.length === 1 ? "vraag" : "vragen"}. Oefen ze opnieuw, of klap er een open om het antwoord te bekijken.`)}</p>
           ${countButtons(pool.length)}
           <div class="list">${items}</div>
-          <div class="row"><button class="btn danger" id="clear-rep">Lijst leegmaken</button></div>
+          <div class="row"><button class="btn danger" id="clear-rep">${L("Clear list", "Lijst leegmaken")}</button></div>
         </div>`;
 
       bindCounts(pool);
@@ -1091,7 +1114,7 @@ aut: [
       });
 
       document.getElementById("clear-rep").addEventListener("click", () => {
-        if (!confirm("Alle gemarkeerde vragen uit Herhalen verwijderen?")) return;
+        if (!confirm(L("Remove all marked questions from Review?", "Alle gemarkeerde vragen uit Herhalen verwijderen?"))) return;
         herhalen.clear();
         saveSet();
         showSetup();
@@ -1122,12 +1145,12 @@ aut: [
       const done = s.correct + s.wrong;
       s.answered = false;
 
-      barTitle.textContent = `~/school/sprint-1-2/quiz.sh --vak ${s.tab} [${s.i + 1}/${total}]`;
+      barTitle.textContent = `~/school/sprint-1-2/quiz.sh ${L("--subject", "--vak")} ${s.tab} [${s.i + 1}/${total}]`;
 
       view.innerHTML = `
         <div class="fade">
           <div class="stats">
-            <span>Vraag <b>${s.i + 1}</b>/${total}</span>
+            <span>${L("Question", "Vraag")} <b>${s.i + 1}</b>/${total}</span>
             <span id="score">Score <b>${s.correct}</b>/${done}</span>
           </div>
           <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${s.i}">
@@ -1147,10 +1170,10 @@ aut: [
           <div id="feedback"></div>
 
           <div class="actions">
-            <button class="btn warn" id="skip">Weet ik niet / Uitleg</button>
-            <button class="btn" id="next" hidden>${s.i + 1 < total ? "Volgende →" : "Bekijk score →"}</button>
+            <button class="btn warn" id="skip">${L("I don't know / Explain", "Weet ik niet / Uitleg")}</button>
+            <button class="btn" id="next" hidden>${s.i + 1 < total ? L("Next →", "Volgende →") : L("See score →", "Bekijk score →")}</button>
           </div>
-          <p class="hint">Sneltoetsen: 1–4 of A–D om te antwoorden · Enter voor volgende</p>
+          <p class="hint">${L("Shortcuts: 1–4 or A–D to answer · Enter for next", "Sneltoetsen: 1–4 of A–D om te antwoorden · Enter voor volgende")}</p>
         </div>`;
 
       renderMark(key);
@@ -1171,7 +1194,7 @@ aut: [
       if (!m) return;
       const on = herhalen.has(key);
       m.classList.toggle("on", on);
-      m.textContent = on ? "★ in herhalen" : "☆ herhalen";
+      m.textContent = on ? L("★ in review", "★ in herhalen") : L("☆ review", "☆ herhalen");
       m.setAttribute("aria-pressed", on);
     }
 
@@ -1204,7 +1227,7 @@ aut: [
       lockOptions(q, picked);
       document.getElementById("feedback").innerHTML = `
         <div class="explain ${ok ? "good" : "bad"} fade">
-          <strong>${ok ? "✓ Goed!" : `✗ Fout, het juiste antwoord is ${LETTERS[q.ans]}.`}</strong>
+          <strong>${ok ? L("✓ Correct!", "✓ Goed!") : L(`✗ Wrong, the correct answer is ${LETTERS[q.ans]}.`, `✗ Fout, het juiste antwoord is ${LETTERS[q.ans]}.`)}</strong>
           ${q.exp}
         </div>`;
       document.getElementById("score").innerHTML = `Score <b>${s.correct}</b>/${s.correct + s.wrong}`;
@@ -1225,7 +1248,7 @@ aut: [
       lockOptions(q, -1);
       document.getElementById("feedback").innerHTML = `
         <div class="explain skip fade">
-          <strong>💡 Uitleg: het antwoord is ${LETTERS[q.ans]}. (toegevoegd aan Herhalen)</strong>
+          <strong>${L(`💡 Explanation: the answer is ${LETTERS[q.ans]}. (added to Review)`, `💡 Uitleg: het antwoord is ${LETTERS[q.ans]}. (toegevoegd aan Herhalen)`)}</strong>
           ${q.exp}
         </div>`;
     }
@@ -1245,13 +1268,13 @@ aut: [
       const counted = s.correct + s.wrong;
       const pct = counted ? Math.round((s.correct / counted) * 100) : 0;
       const tone = pct >= 70 ? "" : pct >= 50 ? "meh" : "low";
-      const verdict = counted === 0 ? "Alles overgeslagen, de uitleg staat nu in Herhalen."
-        : pct >= 90 ? "Sterk! Die toets kan komen."
-        : pct >= 70 ? "Netjes. Nog even de foutjes doorlopen?"
-        : pct >= 50 ? "Op de goede weg, maar er zit nog wat ruimte in."
-        : "Oef. Pak de uitleg erbij en probeer het nog eens.";
+      const verdict = counted === 0 ? L("Everything skipped, the explanations are now in Review.", "Alles overgeslagen, de uitleg staat nu in Herhalen.")
+        : pct >= 90 ? L("Strong! Bring on that exam.", "Sterk! Die toets kan komen.")
+        : pct >= 70 ? L("Nice. Go over the mistakes once more?", "Netjes. Nog even de foutjes doorlopen?")
+        : pct >= 50 ? L("On the right track, but there's room to improve.", "Op de goede weg, maar er zit nog wat ruimte in.")
+        : L("Oof. Grab the explanations and try again.", "Oef. Pak de uitleg erbij en probeer het nog eens.");
 
-      barTitle.textContent = `~/school/sprint-1-2/quiz.sh --vak ${s.tab} --done`;
+      barTitle.textContent = `~/school/sprint-1-2/quiz.sh ${L("--subject", "--vak")} ${s.tab} --done`;
 
       const review = s.results.map(r => {
         const q = getQ(r.key);
@@ -1263,20 +1286,20 @@ aut: [
 
       view.innerHTML = `
         <div class="fade">
-          <p class="line"><span class="prompt">$</span> ./quiz.sh --vak ${s.tab} --result</p>
-          <h1>Sessie klaar</h1>
+          <p class="line"><span class="prompt">$</span> ./quiz.sh ${L("--subject", "--vak")} ${s.tab} --result</p>
+          <h1>${L("Session done", "Sessie klaar")}</h1>
           <div class="score ${tone}">${s.correct}/${counted}</div>
           <p class="sub" style="margin-bottom:0.8rem">${verdict}</p>
           <div class="summary">
-            <span class="g">✓ ${s.correct} goed</span>
-            <span class="r">✗ ${s.wrong} fout</span>
-            <span class="y">? ${s.skipped} overgeslagen</span>
+            <span class="g">✓ ${s.correct} ${L("correct", "goed")}</span>
+            <span class="r">✗ ${s.wrong} ${L("wrong", "fout")}</span>
+            <span class="y">? ${s.skipped} ${L("skipped", "overgeslagen")}</span>
             ${counted ? `<span>${pct}%</span>` : ""}
           </div>
           <div class="row">
-            <button class="btn" id="again">Nieuwe sessie</button>
-            ${wrongKeys.length ? `<button class="btn warn" id="add-wrong">Fouten naar Herhalen (${wrongKeys.length})</button>` : ""}
-            ${herhalen.size ? `<button class="btn ghost" id="to-rep">Naar Herhalen</button>` : ""}
+            <button class="btn" id="again">${L("New session", "Nieuwe sessie")}</button>
+            ${wrongKeys.length ? `<button class="btn warn" id="add-wrong">${L("Mistakes to Review", "Fouten naar Herhalen")} (${wrongKeys.length})</button>` : ""}
+            ${herhalen.size ? `<button class="btn ghost" id="to-rep">${L("Go to Review", "Naar Herhalen")}</button>` : ""}
           </div>
           <div class="review">${review}</div>
         </div>`;
@@ -1288,7 +1311,7 @@ aut: [
         wrongKeys.forEach(k => herhalen.add(k));
         saveSet();
         addWrong.disabled = true;
-        addWrong.textContent = "✓ Toegevoegd";
+        addWrong.textContent = L("✓ Added", "✓ Toegevoegd");
       });
 
       const toRep = document.getElementById("to-rep");

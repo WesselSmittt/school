@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>School · Wessel Smit</title>
-  <meta name="description" content="School modules van Wessel Smit: oefenmodules en quizzen voor HBO-ICT.">
+  <meta name="description" content="School modules by Wessel Smit: practice modules and quizzes for HBO-ICT.">
   <meta name="theme-color" content="#0b0c0e">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230b0c0e'/><path d='M18 28h14l8 38 10-38h0l10 38 8-38h14L68 76H56L50 52 44 76H32Z' fill='%23ff5a1f'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -270,6 +270,24 @@
     .brand-text { overflow: hidden; text-overflow: ellipsis; }
     .brand .crumb { color: var(--muted); font-weight: 400; }
 
+    .nav-right { display: flex; align-items: center; gap: 0.25rem; flex: none; }
+
+    .lang-toggle {
+      display: flex;
+      gap: 0.6ch;
+      font: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: #4a5059;
+      background: none;
+      border: 0;
+      padding: 0.35rem 0.6rem;
+      cursor: pointer;
+    }
+
+    .lang-toggle span.on { color: var(--accent); }
+    .lang-toggle:hover { background: var(--panel); color: var(--muted); }
+
     .back {
       font-size: 0.72rem;
       letter-spacing: 0.1em;
@@ -390,9 +408,12 @@
 <body>
 
   <header class="nav">
-    <nav class="nav-inner" aria-label="Navigatie">
+    <nav class="nav-inner" aria-label="Navigation" data-nl-aria-label="Navigatie">
       <a href="https://wesselsmit.com/" class="brand"><span class="brand-mark" aria-hidden="true">W</span><span class="brand-text">WESSEL SMIT <span class="crumb">/ SCHOOL</span></span></a>
-      <a href="https://wesselsmit.com/" class="back">← portfolio</a>
+      <div class="nav-right">
+        <button class="lang-toggle" type="button" data-lang-toggle><span data-lang="en">EN</span><span data-lang="nl">NL</span></button>
+        <a href="https://wesselsmit.com/" class="back">← portfolio</a>
+      </div>
     </nav>
   </header>
 
@@ -400,7 +421,7 @@
     <div class="section-head">
       <div class="cmd">ls ./school</div>
       <h1>School modules</h1>
-      <p>Kies een module om te oefenen. Er komen er steeds meer bij.</p>
+      <p data-nl="Kies een module om te oefenen. Er komen er steeds meer bij.">Pick a module to practise. More are added over time.</p>
     </div>
 
     <!--
@@ -411,8 +432,8 @@
     <div class="modules-grid">
       <a href="sprint-1-2/index.html" class="card active" style="--i: 0">
         <div class="card-icon" aria-hidden="true">MOD-01</div>
-        <h2>Theorie Sprint 1 &amp; 2</h2>
-        <p>Oefen de theorietoets met quizvragen per vak en herhaal wat je fout had.</p>
+        <h2 data-nl="Theorie Sprint 1 &amp; 2">Theory Sprint 1 &amp; 2</h2>
+        <p data-nl="Oefen de theorietoets met quizvragen per vak en herhaal wat je fout had.">Practise the theory exam with quiz questions per subject and review what you got wrong.</p>
         <div class="tags"><span>IoT</span><span>ANW</span><span>SDN</span><span>AUT</span></div>
         <div class="card-foot">
           <span class="badge live">● online</span>
@@ -422,20 +443,22 @@
 
       <div class="card disabled" style="--i: 1" aria-disabled="true">
         <div class="card-icon" aria-hidden="true">MOD-02</div>
-        <h2>Theorie Sprint 3 &amp; 4</h2>
-        <p>Oefenvragen voor de volgende theorietoets.</p>
-        <div class="card-foot"><span class="badge lock">binnenkort</span></div>
+        <h2 data-nl="Theorie Sprint 3 &amp; 4">Theory Sprint 3 &amp; 4</h2>
+        <p data-nl="Oefenvragen voor de volgende theorietoets.">Practice questions for the next theory exam.</p>
+        <div class="card-foot"><span class="badge lock" data-nl="binnenkort">coming soon</span></div>
       </div>
 
       <div class="card disabled" style="--i: 2" aria-disabled="true">
         <div class="card-icon" aria-hidden="true">MOD-03</div>
-        <h2>Begrippenlijst</h2>
-        <p>Alle belangrijke begrippen op één plek, doorzoekbaar.</p>
-        <div class="card-foot"><span class="badge lock">binnenkort</span></div>
+        <h2 data-nl="Begrippenlijst">Glossary</h2>
+        <p data-nl="Alle belangrijke begrippen op één plek, doorzoekbaar.">All the key terms in one place, searchable.</p>
+        <div class="card-foot"><span class="badge lock" data-nl="binnenkort">coming soon</span></div>
       </div>
     </div>
   </main>
 
   <footer>Built by Wessel Smit · 2026</footer>
+
+  <script src="/i18n.js"></script>
 </body>
 </html>
